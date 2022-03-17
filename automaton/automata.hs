@@ -26,3 +26,18 @@ isDeterministic     :: Automaton q s -> Bool
 isDeterministic auto = all (\x -> length x == 0) epsillonTrans && all (\x -> length x == 1) alphaTrans
                        where epsillonTrans = [delta auto q Nothing | q <- states auto]
                              alphaTrans    = [delta auto q (Just s) | q <- states auto, s <- alphabet auto]
+
+accept          :: (Eq q) => Automaton q s -> [s] -> Bool
+accept auto word = or (acceptFrom auto word q)
+                   where q = initial auto
+
+flattern :: [[a]] -> [a]
+flattern  = foldr (++) []
+
+ 
+acceptFrom              :: (Eq q) => Automaton q s -> [s] -> q -> [Bool]
+acceptFrom auto [] z     = [z `elem` (finals auto)]
+acceptFrom auto (x:xs) z = flattern (map (acceptFrom auto xs) ys) ++ flattern (map (acceptFrom auto (x:xs)) zs)
+                           where ys = delta auto z (Just x)
+                                 zs = delta auto z Nothing
+
