@@ -20,3 +20,9 @@ nfa1 = Automaton states alphabet initial finals delta
              delta 'B' (Just 1) = ['A']
            --delta 'A' Nothing  = ['B']
              delta _   _        = [] 
+
+--Function that checks if a given automaton is deterministic or not
+isDeterministic     :: Automaton q s -> Bool
+isDeterministic auto = all (\x -> length x == 0) epsillonTrans && all (\x -> length x == 1) alphaTrans
+                       where epsillonTrans = [delta auto q Nothing | q <- states auto]
+                             alphaTrans    = [delta auto q (Just s) | q <- states auto, s <- alphabet auto]
